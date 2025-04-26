@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coze聊天机器人集成示例</title>
+    <style>
+        /* 保留原有样式不变 */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: #f5f5f5;
+            min-height: 100vh;
+        }
+        h1 {
+            color: #333;
+        }
+        .container {
+            width: 100%;
+            max-width: 800px;
+            margin-top: 20px;
+        }
+        .coze-chat-container {
+            height: 600px;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            display: none;
+        }
+        .chat-icon {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 70px;
+            height: 70px;
+            background-color: #1890ff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+        .chat-icon:hover {
+            transform: scale(1.1);
+            background-color: #40a9ff;
+        }
+        .chat-icon img {
+            width: 40px;
+            height: 40px;
+        }
+        .close-chat {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #ff4d4f;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            font-size: 16px;
+            cursor: pointer;
+            z-index: 1001;
+        }
+    </style>
+</head>
+<body>
+    <h1>我的Coze聊天机器人</h1>
+    <p>这是一个简单的Coze Web SDK集成示例</p>
+    
+    <div class="container">
+        <div class="coze-chat-container" id="coze-chat">
+            <button class="close-chat" id="close-chat">×</button>
+        </div>
+    </div>
+
+
+
+    <script src="https://lf-cdn.coze.cn/obj/unpkg/flow-platform/chat-app-sdk/1.2.0-beta.6/libs/cn/index.js"></script>
+    <script>
+        // 初始化变量
+        let cozeClient = null;
+        
+        // 预加载SDK完成后立即初始化聊天机器人(但保持隐藏)
+        document.addEventListener('DOMContentLoaded', function() {
+            initCozeChat();
+        });
+
+        // 初始化Coze聊天机器人函数
+        function initCozeChat() {
+            if(cozeClient) return; // 防止重复初始化
+            
+            cozeClient = new CozeWebSDK.WebChatClient({
+                config: {
+                    bot_id: '7497424696795775028',
+                },
+                componentProps: {
+                    title: '我的AI助手',
+                    icon: 'https://img.icons8.com/color/48/000000/robot.png',
+                    placeholder: '有什么我可以帮你的吗？',
+                    welcome_message: '你好！我是你的AI助手，请问有什么可以帮助你的？',
+                    theme: 'light',
+                    layout: 'right',
+                    height: '100%',
+                    width: '100%',
+                },
+                auth: {
+                    type: 'token',
+                    token: 'pat_RMPHLNuIeuYjLm3f2acNmvaPadC6degPafpsQZMWs59fljhKxvq174xy6wJ7mnVL',
+                    onRefreshToken: function () {
+                        return 'pat_RMPHLNuIeuYjLm3f2acNmvaPadC6degPafpsQZMWs59fljhKxvq174xy6wJ7mnVL';
+                    }
+                },
+                container: document.querySelector('#coze-chat')
+            });
+
+            cozeClient.on('message', (event) => {
+                console.log('收到消息:', event);
+            });
+
+            cozeClient.on('error', (error) => {
+                console.error('发生错误:', error);
+            });
+        }
+
+        // 点击图标显示/隐藏聊天界面
+        document.getElementById('chat-icon').addEventListener('click', function() {
+            const chatContainer = document.getElementById('coze-chat');
+            chatContainer.style.display = chatContainer.style.display === 'block' ? 'none' : 'block';
+        });
+
+        // 点击关闭按钮隐藏聊天界面
+        document.getElementById('close-chat').addEventListener('click', function(e) {
+            e.stopPropagation(); // 阻止事件冒泡
+            document.getElementById('coze-chat').style.display = 'none';
+        });
+    </script>
+</body>
+</html>
